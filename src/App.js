@@ -1,54 +1,90 @@
 import React, { useState } from 'react'
-import Note from './components/Note'
+import Person from './components/PhoneBook/Person'
+import PersonForm from './components/PhoneBook/PersonForm'
+import Filter from './components/PhoneBook/Filter'
 
-const App = (props) => {
-    const [notes, setNotes] = useState(props.notes)
+const App = () => {
+    const [ persons, setPersons ] = useState([
+            {
+                id: 1,
+                name: 'Arto Hellas',
+                phone: '13133333333'
+            },
+            {
+                id: 2,
+                name: 'Ada Lovelace',
+                phone: '39-44-5323523'
+            },
+            {
+                id: 3,
+                name: 'Dan Abramov',
+                phone: '12-43-234345' },
+            {
+                id: 4,
+                name: 'Mary Poppendieck',
+                phone: '39-23-6423122'
+            }
+        ])
+    const [ newName, setNewName ] = useState('')
+    const [ newPhone, setNewPhone ] = useState('')
 
-    const [newNote, setNewNote] = useState('')
+    const [ filterPhone, setFilterPhone ] = useState('')
 
-    const [showAll, setShowAll] = useState(true)
+    const submitHandler = ev => {
+        ev.preventDefault()
 
-    const inputChangeHandler = event => {
-        console.log('@input change')
-        console.log(event.target.value)
-        setNewNote(event.target.value)
-    }
+        const hasSame = persons.findIndex( e => {
+            return e.name === newName
+        }) !== -1
 
-    const addNote = event => {
-        event.preventDefault()
-        const newNoteData = {
-            id: notes.length + 1,
-            content: newNote,
-            date: new Date().toISOString(),
-            important: Math.random < 0.5
+        if (hasSame) {
+            alert(`${newName} has already added to the phonebook`)
+            return
         }
-        setNotes(notes.concat(newNoteData))
-        setNewNote('')
+
+        setPersons(persons.concat({
+            id: persons.length + 1,
+            name: newName,
+            phone: newPhone
+        }))
+        setNewName('')
+        setNewPhone('')
     }
 
-    const notesToShow = showAll
-        ? notes
-        : notes.filter(e => e.important)
+
+    const needShow = filterPhone.length <= 0
+        ? persons
+        : persons.filter(e => {
+            return e.phone.match(filterPhone)
+        })
+
+    const filterHandler = val => {
+        console.log(val)
+        setFilterPhone(val)
+    }
 
     return (
         <div>
-            <h1>Notes</h1>
-            <div>
-                <button onClick={()=>{
-                    setShowAll(!showAll)
-                }}>
-                    查看{showAll ? '重要': '全部'}
-                </button>
-            </div>
-            <ul>
-                {notesToShow.map(note =>
-                    <Note key={note.id} note={note} />
-                )}
-            </ul>
-            <form onSubmit={addNote}>
-                <input placeholder="a new note..." value={newNote} onChange={inputChangeHandler}/>
-                <button type="submit">save</button>
-            </form>
+            <h2>Phonebook</h2>
+            <PersonForm newName={newName}
+                newPhone={newPhone}
+                submitHandler={submitHandler}
+                setNewName={(val) => {
+                    setNewName(val)
+                }}
+                setNewPhone={(val) => {
+                    setNewPhone(val)
+                }}></PersonForm>
+            <h2>Filter</h2>
+            <Filter filterHandler={filterHandler}></Filter>
+            <h2>Numbers</h2>
+            {
+                needShow.map( e => {
+                    return (
+                        <Person person={e} key={e.id}></Person>
+                    )
+                })
+            }
         </div>
     )
 }
