@@ -1,84 +1,47 @@
 import React, { useState, useEffect } from 'react'
-import PersonForm from './components/PhoneBook/PersonForm'
-import Filter from './components/PhoneBook/Filter'
-import Person from './components/PhoneBook/Person'
+import Filter from './components/Countries/Filter'
+import Results from './components/Countries/Results'
 
 import axios from 'axios'
 
-
-
-
 const App = () => {
-    const [ persons, setPersons ] = useState([])
-    const [ newName, setNewName ] = useState('')
-    const [ newPhone, setNewPhone ] = useState('')
+    const [ countries, setCountries ] = useState([])
 
-    const [ filterPhone, setFilterPhone ] = useState('')
+    const [ filterKey, setFilterKey ] = useState('')
 
     useEffect(() => {
         axios
-            .get('http://localhost:3001/persons')
+            .get('https://restcountries.eu/rest/v2/all')
             .then(res => {
                 const { data } = res
-                setPersons(data)
+                data.forEach(e => {
+                    e.__showAll = false
+                })
+                setCountries(data.slice(0,10))
             })
     }, [])
 
-    const submitHandler = ev => {
-        ev.preventDefault()
 
-        const hasSame = persons.findIndex( e => {
-            return e.name === newName
-        }) !== -1
-
-        if (hasSame) {
-            alert(`${newName} has already added to the phonebook`)
-            return
-        }
-
-        setPersons(persons.concat({
-            id: persons.length + 1,
-            name: newName,
-            phone: newPhone
-        }))
-        setNewName('')
-        setNewPhone('')
-    }
-
-
-    const needShow = filterPhone.length <= 0
-        ? persons
-        : persons.filter(e => {
-            return e.phone.match(filterPhone)
+    const results = filterKey.length <= 0
+        ? countries
+        : countries.filter(e => {
+            return e.name.match(filterKey)
         })
 
     const filterHandler = val => {
-        console.log(val)
-        setFilterPhone(val)
+        setFilterKey(val)
+    }
+
+    const showAllHandler = item => {
+        item.__showAll = !item.__showAll
+        setCountries([...countries])
     }
 
     return (
         <div>
-            <h2>Phonebook</h2>
-            <PersonForm newName={newName}
-                newPhone={newPhone}
-                submitHandler={submitHandler}
-                setNewName={(val) => {
-                    setNewName(val)
-                }}
-                setNewPhone={(val) => {
-                    setNewPhone(val)
-                }}></PersonForm>
-            <h2>Filter</h2>
             <Filter filterHandler={filterHandler}></Filter>
-            <h2>Numbers</h2>
-            {
-                needShow.map( e => {
-                    return (
-                        <Person person={e} key={e.id}></Person>
-                    )
-                })
-            }
+            <h2>Results</h2>
+            <Results results={results} showAllHandler={showAllHandler}></Results>
         </div>
     )
 }
