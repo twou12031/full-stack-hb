@@ -32,9 +32,13 @@ const App = () => {
         setFilterKey(val)
     }
 
-    const showAllHandler = item => {
-        item.__showAll = !item.__showAll
-        setCountries([...countries])
+    const showAllHandler = numericCode => {
+        console.log(numericCode)
+        const country = countries.find(n => n.numericCode === numericCode)
+        const changedCountry = { ...country, __showAll: !country.__showAll }
+
+        // item.__showAll = !item.__showAll
+        setCountries(countries.map(e => e.numericCode !== numericCode ? e : changedCountry))
     }
 
     return (

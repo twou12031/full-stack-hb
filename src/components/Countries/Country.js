@@ -7,8 +7,6 @@ const Country = ({item, showDetail, showAllHandler}) => {
 
     const weatherAPIKey = process.env.REACT_APP_API_KEY
 
-    console.log(weatherAPIKey)
-
     useEffect(() => {
         axios
             .get(`http://api.weatherstack.com/current?access_key=${weatherAPIKey}&query=${item.name}`)
@@ -27,7 +25,7 @@ const Country = ({item, showDetail, showAllHandler}) => {
             <div style={itemMask}>
                 <p>{item.name}</p>
                 <button onClick={() => {
-                    showAllHandler(item)
+                    showAllHandler()
                 }}>ShowAll</button>
             </div>
         )

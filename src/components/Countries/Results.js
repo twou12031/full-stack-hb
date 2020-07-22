@@ -22,7 +22,9 @@ const Results = ({results, showAllHandler}) => {
                         item={e}
                         showDetail={e.__showAll}
                         key={e.numericCode}
-                        showAllHandler={showAllHandler}></Country>
+                        showAllHandler={() => {
+                            showAllHandler(e.numericCode)
+                        }}></Country>
                 )
             })
         )
