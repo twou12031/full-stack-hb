@@ -1,52 +1,123 @@
 import React, { useState, useEffect } from 'react'
-import Filter from './components/Countries/Filter'
-import Results from './components/Countries/Results'
+import PersonForm from './components/PhoneBook/PersonForm'
+import Filter from './components/PhoneBook/Filter'
+import Person from './components/PhoneBook/Person'
 
-import axios from 'axios'
+import personService from './services/person'
 
 const App = () => {
-    const [ countries, setCountries ] = useState([])
+    const [ persons, setPersons ] = useState([])
+    const [ newName, setNewName ] = useState('')
+    const [ newPhone, setNewPhone ] = useState('')
 
-    const [ filterKey, setFilterKey ] = useState('')
+    const [ filterPhone, setFilterPhone ] = useState('')
 
     useEffect(() => {
-        axios
-            .get('https://restcountries.eu/rest/v2/all')
+        personService
+           .getAll()
             .then(res => {
-                const { data } = res
-                data.forEach(e => {
-                    e.__showAll = false
-                })
-                setCountries(data.slice(0,10))
+                setPersons(res)
+            })
+           .catch(err => {
+               console.log(err)
             })
     }, [])
 
+    const submitHandler = ev => {
+        ev.preventDefault()
 
-    const results = filterKey.length <= 0
-        ? countries
-        : countries.filter(e => {
-            return e.name.match(filterKey)
+        const hasSame = persons.find( e => {
+            return e.name === newName
+        })
+
+        if (hasSame) {
+            personService
+                .update(hasSame.id, {
+                    ...hasSame,
+                    phone: newPhone
+                })
+                .then(res => {
+                    setPersons(persons.map(e => e.id === hasSame.id? res: e))
+                    setNewName('')
+                    setNewPhone('')
+                })
+               .catch(err => {
+                   console.log(err)
+                })
+            return
+        }
+
+        const newPerson = {
+            id: persons.length + 1,
+            name: newName,
+            phone: newPhone
+        }
+
+        personService
+            .create(newPerson)
+            .then(res => {
+                setPersons(persons.concat(res))
+                setNewName('')
+                setNewPhone('')
+            })
+           .catch(err => {
+               console.log(err)
+            })
+    }
+
+    const delHandler = id => {
+        const res = window.confirm('make sure del this?')
+
+        if (!res) {
+            return
+        }
+
+        personService
+            .remove(id)
+            .then(res => {
+                if (typeof res === 'object') {
+                    setPersons(persons.filter(e => e.id !== id))
+                }
+            })
+           .catch(err => {
+               console.log(err)
+            })
+    }
+
+    const needShow = filterPhone.length <= 0
+        ? persons
+        : persons.filter(e => {
+            return e.phone.match(filterPhone)
         })
 
     const filterHandler = val => {
-        setFilterKey(val)
-    }
-
-    const showAllHandler = numericCode => {
-        console.log(numericCode)
-        const country = countries.find(n => n.numericCode === numericCode)
-        const changedCountry = { ...country, __showAll: !country.__showAll }
-
-        // item.__showAll = !item.__showAll
-        setCountries(countries.map(e => e.numericCode !== numericCode ? e : changedCountry))
+        console.log(val)
+        setFilterPhone(val)
     }
 
     return (
         <div>
+            <h2>Phonebook</h2>
+            <PersonForm newName={newName}
+                newPhone={newPhone}
+                submitHandler={submitHandler}
+                setNewName={(val) => {
+                    setNewName(val)
+                }}
+                setNewPhone={(val) => {
+                    setNewPhone(val)
+                }}></PersonForm>
+            <h2>Filter</h2>
             <Filter filterHandler={filterHandler}></Filter>
-            <h2>Results</h2>
-            <Results results={results} showAllHandler={showAllHandler}></Results>
-        </div>
+            <h2>Numbers</h2>
+            {
+                needShow.map( e => {
+                    return (
+                        <Person person={e} key={e.id} delHandler={delHandler}></Person>
+                    )
+                })
+            }
+            </div>
     )
 }
 
