@@ -1,7 +1,7 @@
 import React from 'react'
 
-const Filter = ({newName, setNewName, newPhone, setNewPhone, submitHandler}) => {
-    const disableAddBtn = newName.length <= 0 || newPhone.length <= 0
+const Filter = ({newName, setNewName, newNumber, setNewNumber, submitHandler}) => {
+    const disableAddBtn = newName.length <= 0 || newNumber.length <= 0
 
     return (
         <form>
@@ -10,8 +10,8 @@ const Filter = ({newName, setNewName, newPhone, setNewPhone, submitHandler}) => 
                     setNewName(ev.target.value)
                 }}/>
                 <br/>
-                phone: <input value={newPhone} onChange={ev => {
-                    setNewPhone(ev.target.value)
+                number: <input value={newNumber} onChange={ev => {
+                    setNewNumber(ev.target.value)
                 }}/>
             </div>
             <div>

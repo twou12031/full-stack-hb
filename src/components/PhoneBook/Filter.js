@@ -2,6 +2,7 @@ import React from 'react'
 
 const Filter = ({filterPhone, filterHandler}) => {
     const changeHandler = ev => {
+        ev.preventDefault()
         filterHandler(ev.target.value)
     }
     return (
