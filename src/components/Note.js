@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Note = ({note}) => (
+const Note = ({ note }) => (
     <li>{note.content}</li>
 )
 

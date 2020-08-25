@@ -16,17 +16,17 @@ const App = () => {
 
     const clickHandler = (key) => () => {
         switch (key) {
-            case 'good':
-                setGood(good + 1)
-                break;
-            case 'neutral':
-                setNeutral(neutral + 1)
-                break;
-            case 'bad':
-                setBad(bad + 1)
-                break;
-            default:
-                break;
+        case 'good':
+            setGood(good + 1)
+            break
+        case 'neutral':
+            setNeutral(neutral + 1)
+            break
+        case 'bad':
+            setBad(bad + 1)
+            break
+        default:
+            break
         }
     }
 
@@ -62,5 +62,5 @@ const App = () => {
 }
 
 ReactDOM.render(<App />,
-  document.getElementById('root')
+    document.getElementById('root')
 )

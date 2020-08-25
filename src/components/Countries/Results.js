@@ -1,7 +1,7 @@
 import React from 'react'
 import Country from './Country'
 
-const Results = ({results, showAllHandler}) => {
+const Results = ({ results, showAllHandler }) => {
     if (results.length <= 0) {
         return (
             <p>nothing has finded</p>

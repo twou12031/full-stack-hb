@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PersonForm from './components/PhoneBook/PersonForm'
 import LoginForm from './components/PhoneBook/LoginForm'
 import Filter from './components/PhoneBook/Filter'
 import Person from './components/PhoneBook/Person'
+import Toggle from './components/PhoneBook/Toggle'
 
 import personService from './services/person'
 import loginService from './services/login'
@@ -11,78 +12,65 @@ const App = () => {
     const [ errMessage, setErrMessage ] = useState('')
 
     const [ persons, setPersons ] = useState([])
-    const [ newName, setNewName ] = useState('')
-    const [ newNumber, setNewNumber ] = useState('')
 
     const [ filterNumber, setFilterNumber ] = useState('')
 
-    const [ username, setUsername ] = useState('')
-    const [ password, setPassword ] = useState('')
-
     const [ user, setUser ] = useState(null)
+
+    const personFormRef = useRef()
 
     useEffect(() => {
         personService
-           .getAll()
+            .getAll()
             .then(res => {
                 setPersons(res)
             })
-           .catch(err => {
-               console.log(err)
+            .catch(err => {
+                console.log(err)
             })
     }, [])
 
     useEffect(() => {
         const userJSON = window.localStorage.getItem('user')
         if (userJSON) {
-          const user = JSON.parse(userJSON)
-          setUser(user)
-          personService.setToken(user.token)
+            const user = JSON.parse(userJSON)
+            setUser(user)
+            personService.setToken(user.token)
         }
     }, [])
 
-    const submitHandler = ev => {
-        ev.preventDefault()
+    const addNote = async newPerson => {
 
-        const hasSame = persons.find( e => {
-            return e.name === newName
-        })
+        const { newName, newNumber } = newPerson
+        try {
+            const hasSame = persons.find( e => {
+                return e.name === newName
+            })
 
-        if (hasSame) {
-            personService
-                .update(hasSame.id, {
+            if (hasSame) {
+                const res = await personService.update(hasSame.id, {
                     ...hasSame,
                     number: newNumber
                 })
-                .then(res => {
-                    setPersons(persons.map(e => e.id === hasSame.id? res: e))
-                    setNewName('')
-                    setNewNumber('')
-                })
-               .catch(err => {
-                   console.log(err)
-                })
-            return
-        }
+                setPersons(persons.map(e => e.id === hasSame.id? res: e))
+                return
+            }
 
-        const newPerson = {
-            id: persons.length + 1,
-            name: newName,
-            number: newNumber
+            const newPersonData = {
+                id: persons.length + 1,
+                name: newName,
+                number: newNumber
+            }
+            const res = await personService.create(newPersonData)
+            setPersons([
+                ...persons,
+                res
+            ])
+            personFormRef.current.toggleVisibility()
+        } catch (err) {
+            console.log(err)
+            alert('addNote failed')
         }
-
-        personService
-            .create(newPerson)
-            .then(res => {
-                setPersons(persons.concat(res))
-                setNewName('')
-                setNewNumber('')
-            })
-           .catch(err => {
-                console.log(err.response.data)
-                const { data } = err.response
-                alert(data.err.toString())
-            })
     }
 
     const delHandler = id => {
@@ -99,8 +87,8 @@ const App = () => {
                     setPersons(persons.filter(e => e.id !== id))
                 }
             })
-           .catch(err => {
-               console.log(err)
+            .catch(err => {
+                console.log(err)
             })
     }
 
@@ -114,8 +102,7 @@ const App = () => {
         setFilterNumber(val)
     }
 
-    const handleLogin = async (ev) => {
-        ev.preventDefault()
+    const handleLogin = async ({ username, password }) => {
         try {
             const user = await loginService.login({
                 username,
@@ -126,8 +113,6 @@ const App = () => {
             )
             personService.setToken(user.token)
             setUser(user)
-            setUsername('')
-            setPassword('')
         } catch (err) {
             console.log(err)
             setErrMessage('login failed')
@@ -140,32 +125,21 @@ const App = () => {
     return (
         <div>
             <p>{errMessage}</p>
-            <h2>Phonebook</h2>
+            <h1>Phonebook</h1>
             {
                 user === null
-                ?
-                    <LoginForm username={username}
-                        password={password}
-                        submitHandler={handleLogin}
-                        setUsername={(val) => {
-                            setUsername(val)
-                        }}
-                        setPassword={(val) => {
-                            setPassword(val)
-                        }}></LoginForm>
-                :
+                    ?
+                    <Toggle buttonLabel="login">
+                        <LoginForm
+                            loginHandler={handleLogin}></LoginForm>
+                    </Toggle>
+                    :
                     <div>
                         <p>{user.name} logged-in</p>
                         {
-                            <PersonForm newName={newName}
-                                newNumber={newNumber}
-                                submitHandler={submitHandler}
-                                setNewName={(val) => {
-                                    setNewName(val)
-                                }}
-                                setNewNumber={(val) => {
-                                    setNewNumber(val)
-                                }}></PersonForm>
+                            <Toggle buttonLabel="new Person" ref={personFormRef}>
+                                <PersonForm createNote={addNote}></PersonForm>
+                            </Toggle>
                         }
                     </div>
             }
@@ -179,7 +153,7 @@ const App = () => {
                     )
                 })
             }
-            </div>
+        </div>
     )
 }
 

@@ -2,8 +2,8 @@ import React from 'react'
 import Header from './Header'
 import Content from './Content'
 
-const Course = ({course}) => {
-    const {name, parts} = course
+const Course = ({ course }) => {
+    const { name, parts } = course
 
     const total = parts.map(e => e.exercises).reduce((prev, cur) => {
         return cur + prev

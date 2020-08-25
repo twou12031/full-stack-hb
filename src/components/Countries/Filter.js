@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Filter = ({filterPhone, filterHandler}) => {
+const Filter = ({ filterPhone, filterHandler }) => {
     const changeHandler = ev => {
         filterHandler(ev.target.value)
     }

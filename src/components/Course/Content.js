@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Content = ({data}) => {
+const Content = ({ data }) => {
     console.log(data)
 
     return (

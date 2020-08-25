@@ -1,24 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const Filter = ({newName, setNewName, newNumber, setNewNumber, submitHandler}) => {
+const PersonForm = ({ createNote }) => {
+
+    const [ newName, setNewName ] = useState('')
+    const [ newNumber, setNewNumber ] = useState('')
+
+    const addPerson = ev => {
+        ev.preventDefault()
+        createNote({
+            newName,
+            newNumber,
+        })
+
+        setNewName('')
+        setNewNumber('')
+    }
+
     const disableAddBtn = newName.length <= 0 || newNumber.length <= 0
 
     return (
-        <form>
-            <div>
-                name: <input value={newName} onChange={ev => {
-                    setNewName(ev.target.value)
-                }}/>
-                <br/>
-                number: <input value={newNumber} onChange={ev => {
-                    setNewNumber(ev.target.value)
-                }}/>
-            </div>
-            <div>
-                <button disabled={disableAddBtn} type="submit" onClick={submitHandler}>add</button>
-            </div>
-        </form>
+        <div>
+            <h2>Create a new Person</h2>
+            <form onSubmit={addPerson}>
+                <div>
+                    name: <input value={newName} onChange={ev => {
+                        setNewName(ev.target.value)
+                    }}/>
+                    <br/>
+                    number: <input value={newNumber} onChange={ev => {
+                        setNewNumber(ev.target.value)
+                    }}/>
+                </div>
+                <div>
+                    <button disabled={disableAddBtn} type="submit">add</button>
+                </div>
+            </form>
+        </div>
     )
 }
 
-export default Filter
+export default PersonForm
