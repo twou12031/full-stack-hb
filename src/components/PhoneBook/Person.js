@@ -7,7 +7,7 @@ const Person = ({ person, delHandler }) => {
     const showWhenVisible = { display: visible ? '' : 'none' }
 
     return (
-        <div>
+        <div className="person">
             <li style={hideWhenVisible}>
                 {person.name}
                 <button onClick={() => {

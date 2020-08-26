@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 
-const PersonForm = ({ createNote }) => {
+const PersonForm = ({ createPerson }) => {
 
     const [ newName, setNewName ] = useState('')
     const [ newNumber, setNewNumber ] = useState('')
 
     const addPerson = ev => {
         ev.preventDefault()
-        createNote({
+        createPerson({
             newName,
             newNumber,
         })
@@ -19,7 +19,7 @@ const PersonForm = ({ createNote }) => {
     const disableAddBtn = newName.length <= 0 || newNumber.length <= 0
 
     return (
-        <div>
+        <div className="formDiv">
             <h2>Create a new Person</h2>
             <form onSubmit={addPerson}>
                 <div>
