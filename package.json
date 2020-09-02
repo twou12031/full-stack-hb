@@ -10,7 +10,8 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "redux": "^4.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -37,6 +38,7 @@
   },
   "proxy": "http://localhost:3001",
   "devDependencies": {
+    "deep-freeze": "^0.0.1",
     "eslint-plugin-jest": "^23.20.0"
   }
 }

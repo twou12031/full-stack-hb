@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import ReactDOM from 'react-dom'
 import PersonForm from './components/PhoneBook/PersonForm'
 import LoginForm from './components/PhoneBook/LoginForm'
 import Filter from './components/PhoneBook/Filter'
@@ -7,6 +8,8 @@ import Toggle from './components/PhoneBook/Toggle'
 
 import personService from './services/person'
 import loginService from './services/login'
+
+import store from './redux'
 
 const App = () => {
     const [ errMessage, setErrMessage ] = useState('')
@@ -39,7 +42,7 @@ const App = () => {
         }
     }, [])
 
-    const addNote = async newPerson => {
+    const addPerson = async newPerson => {
 
         const { newName, newNumber } = newPerson
         try {
@@ -93,8 +96,8 @@ const App = () => {
     }
 
     const needShow = filterNumber.length <= 0
-        ? persons
-        : persons.filter(e => {
+        ? store.getState()
+        : store.getState().filter(e => {
             return e.number.toString().match(filterNumber)
         })
 
@@ -122,6 +125,27 @@ const App = () => {
         }
     }
 
+    // <div>
+    //     <div>
+    //         {store.getState()}
+    //     </div>
+    //     <button
+    //         onClick={() => store.dispatch({ type: 'INCREMENT' })}
+    //     >
+    //     plus
+    //     </button>
+    //     <button
+    //         onClick={() => store.dispatch({ type: 'DECREMENT' })}
+    //     >
+    //     minus
+    //     </button>
+    //     <button
+    //         onClick={() => store.dispatch({ type: 'ZERO' })}
+    //     >
+    //     zero
+    //     </button>
+    // </div>
+
     return (
         <div>
             <p>{errMessage}</p>
@@ -138,7 +162,7 @@ const App = () => {
                         <p>{user.name} logged-in</p>
                         {
                             <Toggle buttonLabel="new Person" ref={personFormRef}>
-                                <PersonForm createNote={addNote}></PersonForm>
+                                <PersonForm createPerson={addPerson}></PersonForm>
                             </Toggle>
                         }
                     </div>
@@ -156,5 +180,11 @@ const App = () => {
         </div>
     )
 }
+
+const renderApp = () => {
+    ReactDOM.render(<App />, document.getElementById('root'))
+}
+
+store.subscribe(renderApp)
 
 export default App
