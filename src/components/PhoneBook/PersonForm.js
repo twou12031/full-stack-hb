@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
+import {  useDispatch } from 'react-redux'
+import { createPerson } from '../../redux/personReducer'
 
-const PersonForm = ({ createPerson }) => {
+const PersonForm = () => {
+    const dispatch = useDispatch()
 
     const [ newName, setNewName ] = useState('')
     const [ newNumber, setNewNumber ] = useState('')
 
     const addPerson = ev => {
         ev.preventDefault()
-        createPerson({
+        // createPerson({
+        //     newName,
+        //     newNumber,
+        // })
+        dispatch(createPerson({
             newName,
             newNumber,
-        })
+        }))
 
         setNewName('')
         setNewNumber('')

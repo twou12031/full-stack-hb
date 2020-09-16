@@ -39,8 +39,39 @@ const personReducer = (state = [], action) => {
             return e.id !== id ? e : changedPerson
         })
     }
+    case 'DEL_PERSON':
+    {
+        const { id } = action.data
+        return state.filter(e => {
+            return e.id !== id
+        })
+    }
     default:
         return state
+    }
+}
+
+const generateId = () =>
+    Number((Math.random() * 1000000).toFixed(0))
+
+export const createPerson = (data) => {
+    const { newName:name,newNumber:number } = data
+    return {
+        type: 'NEW_PERSON',
+        data: {
+            name,
+            number,
+            id: generateId()
+        }
+    }
+}
+
+export const delPerson = (id) => {
+    return {
+        type: 'DEL_PERSON',
+        data: {
+            id
+        }
     }
 }
 

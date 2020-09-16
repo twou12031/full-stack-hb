@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import ReactDOM from 'react-dom'
+import {  useSelector } from 'react-redux'
+
 import PersonForm from './components/PhoneBook/PersonForm'
 import LoginForm from './components/PhoneBook/LoginForm'
 import Filter from './components/PhoneBook/Filter'
@@ -9,12 +10,11 @@ import Toggle from './components/PhoneBook/Toggle'
 import personService from './services/person'
 import loginService from './services/login'
 
-import store from './redux'
-
 const App = () => {
+    const persons = useSelector(state => state)
     const [ errMessage, setErrMessage ] = useState('')
 
-    const [ persons, setPersons ] = useState([])
+    // const [ persons, setPersons ] = useState([])
 
     const [ filterNumber, setFilterNumber ] = useState('')
 
@@ -22,16 +22,16 @@ const App = () => {
 
     const personFormRef = useRef()
 
-    useEffect(() => {
-        personService
-            .getAll()
-            .then(res => {
-                setPersons(res)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }, [])
+    // useEffect(() => {
+    //     personService
+    //         .getAll()
+    //         .then(res => {
+    //             setPersons(res)
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //         })
+    // }, [])
 
     useEffect(() => {
         const userJSON = window.localStorage.getItem('user')
@@ -42,62 +42,69 @@ const App = () => {
         }
     }, [])
 
-    const addPerson = async newPerson => {
+    // const addPerson = async newPerson => {
 
-        const { newName, newNumber } = newPerson
-        try {
-            const hasSame = persons.find( e => {
-                return e.name === newName
-            })
+    //     const { newName, newNumber } = newPerson
+    //     try {
+    //         const hasSame = persons.find( e => {
+    //             return e.name === newName
+    //         })
 
-            if (hasSame) {
-                const res = await personService.update(hasSame.id, {
-                    ...hasSame,
-                    number: newNumber
-                })
-                setPersons(persons.map(e => e.id === hasSame.id? res: e))
-                return
-            }
+    //         if (hasSame) {
+    //             const res = await personService.update(hasSame.id, {
+    //                 ...hasSame,
+    //                 number: newNumber
+    //             })
+    //             setPersons(persons.map(e => e.id === hasSame.id? res: e))
+    //             return
+    //         }
 
-            const newPersonData = {
-                id: persons.length + 1,
-                name: newName,
-                number: newNumber
-            }
-            const res = await personService.create(newPersonData)
-            setPersons([
-                ...persons,
-                res
-            ])
-            personFormRef.current.toggleVisibility()
-        } catch (err) {
-            console.log(err)
-            alert('addNote failed')
-        }
-    }
+    //         const newPersonData = {
+    //             id: persons.length + 1,
+    //             name: newName,
+    //             number: newNumber
+    //         }
+    //         const res = await personService.create(newPersonData)
+    //         setPersons([
+    //             ...persons,
+    //             res
+    //         ])
+    //         personFormRef.current.toggleVisibility()
+    //     } catch (err) {
+    //         console.log(err)
+    //         alert('addNote failed')
+    //     }
+    // }
 
-    const delHandler = id => {
-        const res = window.confirm('make sure del this?')
+    // const addPerson = data => {
+    //     // const { newName:name,newNumber:number } = data
+    //     dispatch(createPerson(data))
+    // }
 
-        if (!res) {
-            return
-        }
+    // const delHandler = id => {
+    //     const res = window.confirm('make sure del this?')
 
-        personService
-            .remove(id)
-            .then(res => {
-                if (typeof res === 'object') {
-                    setPersons(persons.filter(e => e.id !== id))
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }
+    //     if (!res) {
+    //         return
+    //     }
+
+    //     dispatch(delPerson(id))
+
+    //     // personService
+    //     //     .remove(id)
+    //     //     .then(res => {
+    //     //         if (typeof res === 'object') {
+    //     //             setPersons(persons.filter(e => e.id !== id))
+    //     //         }
+    //     //     })
+    //     //     .catch(err => {
+    //     //         console.log(err)
+    //     //     })
+    // }
 
     const needShow = filterNumber.length <= 0
-        ? store.getState()
-        : store.getState().filter(e => {
+        ? persons
+        : persons.filter(e => {
             return e.number.toString().match(filterNumber)
         })
 
@@ -125,27 +132,6 @@ const App = () => {
         }
     }
 
-    // <div>
-    //     <div>
-    //         {store.getState()}
-    //     </div>
-    //     <button
-    //         onClick={() => store.dispatch({ type: 'INCREMENT' })}
-    //     >
-    //     plus
-    //     </button>
-    //     <button
-    //         onClick={() => store.dispatch({ type: 'DECREMENT' })}
-    //     >
-    //     minus
-    //     </button>
-    //     <button
-    //         onClick={() => store.dispatch({ type: 'ZERO' })}
-    //     >
-    //     zero
-    //     </button>
-    // </div>
-
     return (
         <div>
             <p>{errMessage}</p>
@@ -162,7 +148,7 @@ const App = () => {
                         <p>{user.name} logged-in</p>
                         {
                             <Toggle buttonLabel="new Person" ref={personFormRef}>
-                                <PersonForm createPerson={addPerson}></PersonForm>
+                                <PersonForm></PersonForm>
                             </Toggle>
                         }
                     </div>
@@ -173,7 +159,7 @@ const App = () => {
             {
                 needShow.map( e => {
                     return (
-                        <Person person={e} key={e.id} delHandler={delHandler}></Person>
+                        <Person person={e} key={e.id}></Person>
                     )
                 })
             }
@@ -181,10 +167,5 @@ const App = () => {
     )
 }
 
-const renderApp = () => {
-    ReactDOM.render(<App />, document.getElementById('root'))
-}
-
-store.subscribe(renderApp)
 
 export default App

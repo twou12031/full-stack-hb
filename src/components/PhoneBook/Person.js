@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
+import {   useDispatch } from 'react-redux'
+import {  delPerson } from '../../redux/personReducer'
 
-const Person = ({ person, delHandler }) => {
+const Person = ({ person }) => {
+    const dispatch = useDispatch()
     const [visible, setVisible] = useState(false)
 
     const hideWhenVisible = { display: visible ? 'none' : '' }
@@ -14,7 +17,7 @@ const Person = ({ person, delHandler }) => {
                     setVisible(true)
                 }}>view</button>
                 <button onClick={() => {
-                    delHandler(person.id)
+                    dispatch(delPerson(person.id))
                 }}>del</button>
             </li>
             <li style={showWhenVisible}>
@@ -23,7 +26,7 @@ const Person = ({ person, delHandler }) => {
                     setVisible(false)
                 }}>cancel</button>
                 <button onClick={() => {
-                    delHandler(person.id)
+                    dispatch(delPerson(person.id))
                 }}>del</button>
             </li>
         </div>
